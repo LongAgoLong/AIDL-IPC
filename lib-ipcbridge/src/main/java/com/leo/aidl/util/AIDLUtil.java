@@ -28,7 +28,7 @@ public class AIDLUtil {
         return aidlUtil;
     }
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i("LEO-TEST", "绑定成功");

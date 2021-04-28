@@ -28,7 +28,8 @@ public class AIDLService extends Service {
             try {
                 Class<?> aClass = ServiceManager.getInstance().getClass(request.getInterfacesName());
                 Object object = ServiceManager.getInstance().getObject(aClass.getName());
-                Method me = ServiceManager.getInstance().getMethod(aClass, request.getMethodName());
+                Method me = aClass.getMethod(request.getMethodName(),
+                        ParamsConvert.getParameterTypes(request.getParameters()));
 
                 Object[] params = ParamsConvert.unSerializationParams(request.getParameters());
                 Object result = me.invoke(object, params);

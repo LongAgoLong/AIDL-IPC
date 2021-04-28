@@ -45,10 +45,6 @@ public class ClientManager {
         return mIpcCache.getClass(interfacesName);
     }
 
-    public Method getMethod(Class<?> clazz, String methodName) {
-        return mIpcCache.getMethod(clazz, methodName);
-    }
-
     public Object getObject(String className) {
         return mIpcCache.getObject(className);
     }

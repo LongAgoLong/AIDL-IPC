@@ -15,7 +15,8 @@ public class ClientBridge extends IClientBridge.Stub {
         try {
             Class<?> aClass = ClientManager.getInstance().getClass(request.getInterfacesName());
             Object object = ClientManager.getInstance().getObject(aClass.getName());
-            Method me = ClientManager.getInstance().getMethod(aClass, request.getMethodName());
+            Method me = aClass.getMethod(request.getMethodName(),
+                    ParamsConvert.getParameterTypes(request.getParameters()));
 
             Object[] params = ParamsConvert.unSerializationParams(request.getParameters());
             Object result = me.invoke(object, params);

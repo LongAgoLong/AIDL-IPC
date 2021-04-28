@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 
 public class ClientInvocationHandler implements InvocationHandler {
 
-    private Gson mGson;
-    private String interfacesName;
+    private final Gson mGson;
+    private final String interfacesName;
 
     public ClientInvocationHandler(String interfacesName) {
         this.interfacesName = interfacesName;
@@ -28,7 +28,8 @@ public class ClientInvocationHandler implements InvocationHandler {
         IPCRequest ipcRequest = new IPCRequest();
         ipcRequest.setInterfacesName(interfacesName);
         ipcRequest.setMethodName(method.getName());
-        ipcRequest.setParameters(ParamsConvert.serializationParams(args));
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        ipcRequest.setParameters(ParamsConvert.serializationParams(args, parameterTypes));
         IPCResponse ipcResponse = ClientManager.getInstance().sendRequest(ipcRequest);
         if (ipcResponse != null && ipcResponse.isSuccess()) {
             Class<?> returnType = method.getReturnType();
