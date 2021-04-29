@@ -1,4 +1,4 @@
-package com.leo.aidl.util;
+package com.leo.aidl.client;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,23 +9,21 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.leo.aidl.IService;
-import com.leo.aidl.client.ClientBridge;
-import com.leo.aidl.client.ClientManager;
 
-public class AIDLUtil {
-    private static AIDLUtil aidlUtil;
-    private AIDLUtil() {
+public class IPCBridge {
+    private static IPCBridge IPCBridge;
+    private IPCBridge() {
     }
 
-    public static AIDLUtil getInstance() {
-        if (null == aidlUtil) {
-            synchronized (AIDLUtil.class) {
-                if (null == aidlUtil) {
-                    aidlUtil = new AIDLUtil();
+    public static IPCBridge getInstance() {
+        if (null == IPCBridge) {
+            synchronized (IPCBridge.class) {
+                if (null == IPCBridge) {
+                    IPCBridge = new IPCBridge();
                 }
             }
         }
-        return aidlUtil;
+        return IPCBridge;
     }
 
     private final ServiceConnection connection = new ServiceConnection() {
@@ -35,7 +33,7 @@ public class AIDLUtil {
             IService iService = IService.Stub.asInterface(service);
             try {
                 iService.asBinder().linkToDeath(() -> {},0);
-                iService.attach(new ClientBridge());
+                iService.attach(new ClientImpl());
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -48,7 +46,7 @@ public class AIDLUtil {
         }
     };
 
-    public void bindService(Context context) {
+    public void init(Context context) {
         Intent intent = new Intent("com.leo.aidl");
         intent.setPackage("com.leo.aidl");
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);

@@ -3,7 +3,7 @@ package com.leo.aidl.client;
 import com.google.gson.Gson;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
-import com.leo.aidl.ParamsConvert;
+import com.leo.aidl.util.ParamsConvert;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

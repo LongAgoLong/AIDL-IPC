@@ -7,8 +7,8 @@ import com.leo.aidl.IPCCache;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 
 /**
  * Create by MaZaizhong
@@ -20,6 +20,7 @@ import java.lang.reflect.Proxy;
 public class ServiceManager {
     private IClientBridge mIClientBridge;
     private IPCCache mIpcCache;
+    private final HashMap<String, Object> mInvocationMap = new HashMap<>();
 
     private ServiceManager() {
         mIpcCache = new IPCCache();
@@ -65,12 +66,20 @@ public class ServiceManager {
     }
 
     public <T> T get(Class<T> inter) {
+        String name = inter.getName();
         if (null == mIClientBridge) {
             return null;
         }
         // 获取处理客户端请求的对象的Key，以此在服务端找出对应的处理者
-        return (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class[]{inter},
-                new ServiceInvocationHandler(inter.getName()));
+        if (mInvocationMap.containsKey(name)) {
+            return (T) mInvocationMap.get(name);
+        } else {
+            T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{inter},
+                    new ServiceInvocationHandler(name));
+            mInvocationMap.put(name, t);
+            return t;
+        }
+
     }
 }

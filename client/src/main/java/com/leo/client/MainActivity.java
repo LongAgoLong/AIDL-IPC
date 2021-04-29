@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.leo.aidl.client.ClientManager;
-import com.leo.aidl.util.AIDLUtil;
+import com.leo.aidl.client.IPCBridge;
 import com.leo.lib_interface.bean.DataBean;
 import com.leo.lib_interface.bean.PoiBean;
 import com.leo.lib_interface.client.IPoiListener;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AIDLUtil.getInstance().unbindService(this);
+        IPCBridge.getInstance().unbindService(this);
         ClientManager.getInstance().unRegister(this);
     }
 
@@ -49,11 +49,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mResultTv.setText(null);
                 break;
             case R.id.bindBtn:
-                AIDLUtil.getInstance().bindService(MainActivity.this);
+                IPCBridge.getInstance().init(MainActivity.this);
                 mResultTv.append("绑定服务\n");
                 break;
             case R.id.unbindBtn:
-                AIDLUtil.getInstance().unbindService(MainActivity.this);
+                IPCBridge.getInstance().unbindService(MainActivity.this);
                 mResultTv.append("解除绑定\n");
                 break;
             case R.id.sendRequestBtn:

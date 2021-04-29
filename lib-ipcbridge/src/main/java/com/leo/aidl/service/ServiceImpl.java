@@ -1,20 +1,21 @@
-package com.leo.aidl.client;
+package com.leo.aidl.service;
 
 import android.os.RemoteException;
 
 import com.leo.aidl.IClientBridge;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
-import com.leo.aidl.ParamsConvert;
+import com.leo.aidl.IService;
+import com.leo.aidl.util.ParamsConvert;
 
 import java.lang.reflect.Method;
 
-public class ClientBridge extends IClientBridge.Stub {
+public class ServiceImpl extends IService.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = ClientManager.getInstance().getClass(request.getInterfacesName());
-            Object object = ClientManager.getInstance().getObject(aClass.getName());
+            Class<?> aClass = ServiceManager.getInstance().getClass(request.getInterfacesName());
+            Object object = ServiceManager.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
                     ParamsConvert.getParameterTypes(request.getParameters()));
 
@@ -26,5 +27,10 @@ public class ClientBridge extends IClientBridge.Stub {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void attach(IClientBridge iClientBridge) throws RemoteException {
+        ServiceManager.getInstance().putClientBridge(iClientBridge);
     }
 }

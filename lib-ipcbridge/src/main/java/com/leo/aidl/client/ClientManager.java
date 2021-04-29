@@ -9,6 +9,7 @@ import com.leo.aidl.IService;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 
 /**
  * Create by MaZaizhong
@@ -20,6 +21,7 @@ import java.lang.reflect.Proxy;
 public class ClientManager {
     private IService mIpcService;
     private IPCCache mIpcCache;
+    private final HashMap<String, Object> mInvocationMap = new HashMap<>();
 
     private ClientManager() {
         mIpcCache = new IPCCache();
@@ -69,12 +71,19 @@ public class ClientManager {
     }
 
     public <T> T get(Class<T> inter) {
+        String name = inter.getName();
         if (null == mIpcService) {
             return null;
         }
         // 获取处理客户端请求的对象的Key，以此在服务端找出对应的处理者
-        return (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class[]{inter},
-                new ClientInvocationHandler(inter.getName()));
+        if (mInvocationMap.containsKey(name)) {
+            return (T) mInvocationMap.get(name);
+        } else {
+            T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{inter},
+                    new ClientInvocationHandler(name));
+            mInvocationMap.put(name, t);
+            return t;
+        }
     }
 }

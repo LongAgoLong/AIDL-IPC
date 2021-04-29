@@ -1,6 +1,7 @@
-package com.leo.aidl;
+package com.leo.aidl.util;
 
 import com.google.gson.Gson;
+import com.leo.aidl.IPCParameter;
 
 public class ParamsConvert {
 

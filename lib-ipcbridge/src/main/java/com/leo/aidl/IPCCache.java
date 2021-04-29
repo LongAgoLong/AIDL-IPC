@@ -2,8 +2,6 @@ package com.leo.aidl;
 
 import android.text.TextUtils;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +11,10 @@ public class IPCCache {
      * 保存服务端处理客户端请求的interfaces对应Class映射和内部的方法
      */
     private final Map<String, Class<?>> mClazzs = new HashMap<>();
-    private final Map<Class<?>, HashMap<String, Method>> mMethods = new HashMap<>();
     /**
      * 保存服务端处理客户端请求的实例
      */
-    private final Map<String, WeakReference<Object>> mInstance = new HashMap<>();
+    private final Map<String, Object> mInstance = new HashMap<>();
 
     /**
      * 缓存对象及其方法
@@ -25,19 +22,43 @@ public class IPCCache {
      * @param object
      */
     public void register(Object object) {
+        if (object == null) {
+            return;
+        }
         Class<?> clazz = object.getClass();
-        Class<?>[] interfaces = clazz.getInterfaces();
-        for (Class<?> cls : interfaces) {
-            mClazzs.put(cls.getName(), clazz);
+        boolean result = mappingInterface(clazz);
+        if (!result) {
+            throw new RuntimeException("Does not implement any interface. -> " + clazz.getName());
         }
-        // 缓存Method
-        HashMap<String, Method> method = new HashMap<>();
-        Method[] methods = clazz.getMethods();
-        for (Method m : methods) {
-            method.put(m.getName(), m);
-        }
-        mMethods.put(clazz, method);
         addObject(clazz.getName(), object);
+    }
+
+    /**
+     * 遍历父类，寻找所有实现的adapter-protocol协议接口
+     * 解决继承问题
+     * tip：一个协议接口只能有一个实现类，会覆盖
+     *
+     * @param clazz
+     * @return
+     */
+    private boolean mappingInterface(Class<?> clazz) {
+        boolean isCache = false;
+        Class<?> currentCls = clazz;
+        do {
+            Class<?>[] interfaces = currentCls.getInterfaces();
+            if (interfaces.length != 0) {
+                for (Class<?> inter : interfaces) {
+                    // 加上接口名的path限制
+                    if (inter.getName().startsWith("com.leo.lib_interface.client")
+                            || inter.getName().startsWith("com.leo.lib_interface.provider")) {
+                        isCache = true;
+                        mClazzs.put(inter.getName(), clazz);
+                    }
+                }
+            }
+            currentCls = currentCls.getSuperclass();
+        } while (currentCls != null);
+        return isCache;
     }
 
     public void unRegister(Object object) {
@@ -46,7 +67,6 @@ public class IPCCache {
         for (Class<?> cls : interfaces) {
             mClazzs.remove(cls.getName());
         }
-        mMethods.remove(clazz);
         removeObject(clazz.getName());
     }
 
@@ -57,13 +77,8 @@ public class IPCCache {
         return mClazzs.get(interfacesName);
     }
 
-    public Method getMethod(Class<?> clazz, String methodName) {
-        HashMap<String, Method> methods = mMethods.get(clazz);
-        return methods == null ? null : methods.get(methodName);
-    }
-
     private void addObject(String className, Object object) {
-        mInstance.put(className, new WeakReference<>(object));
+        mInstance.put(className, object);
     }
 
     private void removeObject(String className) {
@@ -71,6 +86,6 @@ public class IPCCache {
     }
 
     public Object getObject(String className) {
-        return mInstance.containsKey(className) ? mInstance.get(className).get() : null;
+        return mInstance.containsKey(className) ? mInstance.get(className) : null;
     }
 }
