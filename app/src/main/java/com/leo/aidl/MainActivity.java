@@ -1,12 +1,12 @@
 package com.leo.aidl;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.leo.aidl.data.DataManager;
-import com.leo.aidl.data.InitResultHelper;
 import com.leo.aidl.service.ServiceCenter;
 import com.leo.lib_interface.bean.PoiBean;
 import com.leo.lib_interface.client.IPoiListener;
@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         ServiceCenter.getInstance().register(DataManager.getInstance());
-        ServiceCenter.getInstance().register(InitResultHelper.getInstance());
     }
 
     private void initView() {
