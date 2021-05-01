@@ -13,8 +13,8 @@ public class ClientImpl extends IClientBridge.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = ClientManager.getInstance().getClass(request.getInterfacesName());
-            Object object = ClientManager.getInstance().getObject(aClass.getName());
+            Class<?> aClass = IPCBridge.getInstance().getClass(request.getInterfacesName());
+            Object object = IPCBridge.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
                     ParamsConvert.getParameterTypes(request.getParameters()));
 

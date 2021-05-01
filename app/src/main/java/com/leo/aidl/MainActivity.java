@@ -6,7 +6,8 @@ import android.util.Log;
 import android.widget.Button;
 
 import com.leo.aidl.data.DataManager;
-import com.leo.aidl.service.ServiceManager;
+import com.leo.aidl.data.InitResultHelper;
+import com.leo.aidl.service.ServiceCenter;
 import com.leo.lib_interface.bean.PoiBean;
 import com.leo.lib_interface.client.IPoiListener;
 
@@ -20,13 +21,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        ServiceManager.getInstance().register(DataManager.getInstance());
+        ServiceCenter.getInstance().register(DataManager.getInstance());
+        ServiceCenter.getInstance().register(InitResultHelper.getInstance());
     }
 
     private void initView() {
         Button button = findViewById(R.id.pushBtn);
         button.setOnClickListener(v -> {
-            IPoiListener iPoiListener = ServiceManager.getInstance().get(IPoiListener.class);
+            IPoiListener iPoiListener = ServiceCenter.getInstance().get(IPoiListener.class);
             if (null == iPoiListener) {
                 Log.e("LEO-TEST", "IPoiListener is NULL");
                 return;
@@ -44,6 +46,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ServiceManager.getInstance().unRegister(DataManager.getInstance());
+        ServiceCenter.getInstance().unRegister(DataManager.getInstance());
     }
 }

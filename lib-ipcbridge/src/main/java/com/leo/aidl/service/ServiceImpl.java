@@ -7,6 +7,8 @@ import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
 import com.leo.aidl.util.ParamsConvert;
+import com.leo.lib_interface.client.ICInitListener;
+import com.leo.lib_interface.provider.ISInitListener;
 
 import java.lang.reflect.Method;
 
@@ -14,8 +16,8 @@ public class ServiceImpl extends IService.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = ServiceManager.getInstance().getClass(request.getInterfacesName());
-            Object object = ServiceManager.getInstance().getObject(aClass.getName());
+            Class<?> aClass = ServiceCenter.getInstance().getClass(request.getInterfacesName());
+            Object object = ServiceCenter.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
                     ParamsConvert.getParameterTypes(request.getParameters()));
 
@@ -31,6 +33,15 @@ public class ServiceImpl extends IService.Stub {
 
     @Override
     public void attach(IClientBridge iClientBridge) throws RemoteException {
-        ServiceManager.getInstance().putClientBridge(iClientBridge);
+        ServiceCenter.getInstance().setClientBridge(iClientBridge);
+        // 通知客户端连接成功
+        ServiceCenter.getInstance().get(ICInitListener.class).onInitSuccess();
+        // 通知服务端连接成功
+        Class<?> aClass = ServiceCenter.getInstance().getClass(ISInitListener.class.getName());
+        if (null != aClass) {
+            ISInitListener initListener = (ISInitListener) ServiceCenter.getInstance()
+                    .getObject(aClass.getName());
+            initListener.onInitSuccess();
+        }
     }
 }

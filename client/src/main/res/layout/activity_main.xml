@@ -8,28 +8,11 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/bindBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="绑定服务"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/unbindBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="解除绑定"
-        app:layout_constraintLeft_toRightOf="@+id/bindBtn"
-        app:layout_constraintTop_toTopOf="@+id/bindBtn" />
-
-    <Button
         android:id="@+id/sendRequestBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="发送请求"
-        app:layout_constraintLeft_toRightOf="@+id/unbindBtn"
-        app:layout_constraintTop_toTopOf="@+id/bindBtn" />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
         android:id="@+id/clearBtn"
@@ -37,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="清空"
         app:layout_constraintLeft_toRightOf="@+id/sendRequestBtn"
-        app:layout_constraintTop_toTopOf="@+id/bindBtn" />
+        app:layout_constraintTop_toTopOf="@+id/sendRequestBtn" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -46,7 +29,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bindBtn">
+        app:layout_constraintTop_toBottomOf="@+id/sendRequestBtn">
 
         <TextView
             android:id="@+id/resultTv"

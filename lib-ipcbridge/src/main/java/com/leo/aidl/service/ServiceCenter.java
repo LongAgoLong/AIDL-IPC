@@ -17,21 +17,25 @@ import java.util.HashMap;
  * in Baidu Company
  * 提供给service使用的帮助类
  */
-public class ServiceManager {
+public class ServiceCenter {
     private IClientBridge mIClientBridge;
-    private IPCCache mIpcCache;
+    private final IPCCache mIpcCache;
     private final HashMap<String, Object> mInvocationMap = new HashMap<>();
+    private static volatile ServiceCenter mServiceCenter;
 
-    private ServiceManager() {
+    private ServiceCenter() {
         mIpcCache = new IPCCache();
     }
 
-    public static ServiceManager getInstance() {
-        return SingleHold.SINGLE;
-    }
-
-    private static class SingleHold {
-        public static final ServiceManager SINGLE = new ServiceManager();
+    public static ServiceCenter getInstance() {
+        if (null == mServiceCenter) {
+            synchronized (ServiceCenter.class) {
+                if (null == mServiceCenter) {
+                    mServiceCenter = new ServiceCenter();
+                }
+            }
+        }
+        return mServiceCenter;
     }
 
     public void register(Object object) {
@@ -50,7 +54,7 @@ public class ServiceManager {
         return mIpcCache.getObject(className);
     }
 
-    public void putClientBridge(IClientBridge iClientBridge) {
+    public void setClientBridge(IClientBridge iClientBridge) {
         this.mIClientBridge = iClientBridge;
     }
 

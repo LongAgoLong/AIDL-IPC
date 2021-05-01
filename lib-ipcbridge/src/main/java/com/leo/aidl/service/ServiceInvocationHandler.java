@@ -30,7 +30,7 @@ public class ServiceInvocationHandler implements InvocationHandler {
         ipcRequest.setMethodName(method.getName());
         Class<?>[] parameterTypes = method.getParameterTypes();
         ipcRequest.setParameters(ParamsConvert.serializationParams(args, parameterTypes));
-        IPCResponse ipcResponse = ServiceManager.getInstance().sendRequest(ipcRequest);
+        IPCResponse ipcResponse = ServiceCenter.getInstance().sendRequest(ipcRequest);
         if (ipcResponse != null && ipcResponse.isSuccess()) {
             Class<?> returnType = method.getReturnType();
             if (returnType != void.class && returnType != Void.class) {
