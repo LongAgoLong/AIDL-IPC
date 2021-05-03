@@ -8,7 +8,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        IPCBridge.getInstance().register(InitResultHelper.getInstance());
+        IPCBridge.getInstance().register(InitResult.getInstance());
         IPCBridge.getInstance().init(this);
     }
 }

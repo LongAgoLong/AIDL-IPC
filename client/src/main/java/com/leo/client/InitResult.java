@@ -2,21 +2,21 @@ package com.leo.client;
 
 import android.util.Log;
 
-import com.leo.lib_interface.client.ICInitListener;
+import com.leo.lib_interface.client.IAttachSuccessListener;
 
-public class InitResultHelper implements ICInitListener {
-    private static final String TAG = "IInitListener";
-    private static volatile InitResultHelper mInstance;
+public class InitResult implements IAttachSuccessListener {
+    private static final String TAG = "IAttachSuccessListener";
+    private static volatile InitResult mInstance;
     private boolean isInit;
 
-    private InitResultHelper() {
+    private InitResult() {
     }
 
-    public static InitResultHelper getInstance() {
+    public static InitResult getInstance() {
         if (null == mInstance) {
-            synchronized (InitResultHelper.class) {
+            synchronized (InitResult.class) {
                 if (null == mInstance) {
-                    mInstance = new InitResultHelper();
+                    mInstance = new InitResult();
                 }
             }
         }

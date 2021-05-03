@@ -7,8 +7,8 @@ import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
 import com.leo.aidl.util.ParamsConvert;
-import com.leo.lib_interface.client.ICInitListener;
-import com.leo.lib_interface.provider.ISInitListener;
+import com.leo.lib_interface.client.IAttachSuccessListener;
+import com.leo.lib_interface.provider.IBindSuccessListener;
 
 import java.lang.reflect.Method;
 
@@ -35,11 +35,11 @@ public class ServiceImpl extends IService.Stub {
     public void attach(IClientBridge iClientBridge) throws RemoteException {
         ServiceCenter.getInstance().setClientBridge(iClientBridge);
         // 通知客户端连接成功
-        ServiceCenter.getInstance().get(ICInitListener.class).onInitSuccess();
+        ServiceCenter.getInstance().get(IAttachSuccessListener.class).onInitSuccess();
         // 通知服务端连接成功
-        Class<?> aClass = ServiceCenter.getInstance().getClass(ISInitListener.class.getName());
+        Class<?> aClass = ServiceCenter.getInstance().getClass(IBindSuccessListener.class.getName());
         if (null != aClass) {
-            ISInitListener initListener = (ISInitListener) ServiceCenter.getInstance()
+            IBindSuccessListener initListener = (IBindSuccessListener) ServiceCenter.getInstance()
                     .getObject(aClass.getName());
             initListener.onInitSuccess();
         }
