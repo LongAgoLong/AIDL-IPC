@@ -4,7 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -21,8 +23,11 @@ public class IPCBridge {
     private static IPCBridge IPCBridge;
 
     private IService mIpcService;
-    private IPCCache mIpcCache;
+    private final IPCCache mIpcCache;
     private final HashMap<String, Object> mInvocationMap = new HashMap<>();
+    private final Handler mUIHandler = new Handler(Looper.getMainLooper());
+
+    private Context mContext;
 
     private IPCBridge() {
         mIpcCache = new IPCCache();
@@ -43,9 +48,12 @@ public class IPCBridge {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i(TAG, "绑定成功");
+            mUIHandler.removeCallbacksAndMessages(null);
             IService iService = IService.Stub.asInterface(service);
             try {
                 iService.asBinder().linkToDeath(() -> {
+                    // 重新绑定操作
+                    rebind();
                 }, 0);
                 iService.attach(new ClientImpl());
             } catch (RemoteException e) {
@@ -60,10 +68,21 @@ public class IPCBridge {
         }
     };
 
-    public void init(Context context) {
+    private void rebind() {
+        mUIHandler.removeCallbacksAndMessages(null);
+        bind();
+        mUIHandler.postDelayed(this::rebind, 3000);
+    }
+
+    private void bind() {
         Intent intent = new Intent("com.leo.aidl");
         intent.setPackage("com.leo.aidl");
-        context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        mContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void init(Context context) {
+        mContext = context;
+        rebind();
     }
 
     public void unbindService(Context context) {
@@ -102,6 +121,9 @@ public class IPCBridge {
     }
 
     public <T> T get(Class<T> inter) {
+        if (!inter.isInterface()) {
+            throw new RuntimeException("inter must be interface.");
+        }
         String name = inter.getName();
         if (null == mIpcService) {
             return null;

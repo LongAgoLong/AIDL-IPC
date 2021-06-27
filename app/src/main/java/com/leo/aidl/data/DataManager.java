@@ -19,8 +19,16 @@ public class DataManager implements IData {
     @Override
     public DataBean getData() {
         DataBean dataBean = new DataBean();
-        dataBean.setName("随机测试");
+        dataBean.setName(getRandomName());
         dataBean.setTime(System.currentTimeMillis());
         return dataBean;
+    }
+
+    private String getRandomName() {
+        return getRandomChar() + String.valueOf(getRandomChar());
+    }
+
+    private char getRandomChar() {
+        return (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
     }
 }
