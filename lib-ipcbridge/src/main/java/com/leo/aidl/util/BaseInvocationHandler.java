@@ -1,7 +1,5 @@
 package com.leo.aidl.util;
 
-import com.google.gson.Gson;
-
 import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,11 +34,11 @@ public abstract class BaseInvocationHandler implements InvocationHandler {
         } else if (returnType == HashSet.class || returnType == LinkedHashSet.class) {
             return Collections.EMPTY_SET;
         } else {
-            try {
-                return returnType.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                return returnType.newInstance();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             return null;
         }
     }

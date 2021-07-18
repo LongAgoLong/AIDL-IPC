@@ -5,7 +5,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.leo.aidl.data.DataManager;
 import com.leo.aidl.data.InitResult;
 import com.leo.aidl.service.ServiceCenter;
 import com.leo.aidl.util.XLog;
@@ -22,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        ServiceCenter.getInstance().register(DataManager.getInstance());
     }
 
     private void initView() {
@@ -45,11 +43,5 @@ public class MainActivity extends AppCompatActivity {
             }
             iPoiListener.receivePoi(poiBeans);
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ServiceCenter.getInstance().unRegister(DataManager.getInstance());
     }
 }

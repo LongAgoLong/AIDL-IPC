@@ -6,7 +6,7 @@ public class XLog {
     private static final String TAG = "ipc_bridge_";
     private static int mLevel;
 
-    public static void init(int level) {
+    public static void setLevel(int level) {
         mLevel = level;
     }
 

@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 DataBean data = iData.getData();
+                if (data == null) {
+                    XLog.e("LEO-TEST", "data is null.");
+                    return;
+                }
                 mResultTv.append(data.toString() + "\n");
                 break;
         }
