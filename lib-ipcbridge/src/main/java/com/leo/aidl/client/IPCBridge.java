@@ -8,12 +8,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.leo.aidl.IPCCache;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
+import com.leo.aidl.util.XLog;
 
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ public class IPCBridge {
     private final IPCCache mIpcCache;
     private final HashMap<String, Object> mInvocationMap = new HashMap<>();
     private final Handler mUIHandler = new Handler(Looper.getMainLooper());
+    private final ClientImpl clientImpl = new ClientImpl();
 
     private Context mContext;
 
@@ -47,15 +48,16 @@ public class IPCBridge {
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.i(TAG, "绑定成功");
+            XLog.i(TAG, "绑定成功");
             mUIHandler.removeCallbacksAndMessages(null);
             IService iService = IService.Stub.asInterface(service);
             try {
                 iService.asBinder().linkToDeath(() -> {
                     // 重新绑定操作
+                    XLog.e(TAG, "service died.");
                     rebind();
                 }, 0);
-                iService.attach(new ClientImpl());
+                iService.attach(clientImpl);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -75,6 +77,7 @@ public class IPCBridge {
     }
 
     private void bind() {
+        XLog.i(TAG, "bind.");
         Intent intent = new Intent("com.leo.aidl");
         intent.setPackage("com.leo.aidl");
         mContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -89,7 +92,7 @@ public class IPCBridge {
         if (null == mIpcService) {
             return;
         }
-        Log.i(TAG, "取消绑定");
+        XLog.i(TAG, "取消绑定");
         context.unbindService(connection);
     }
 

@@ -5,22 +5,22 @@ import android.os.Parcelable;
 
 public class IPCResponse implements Parcelable {
 
-    // 方法返回值序列化的结果
+    /**
+     * 方法返回值序列化的结果
+     */
     private String result;
-    // 本次请求执行情况的描述信息
-    private String message;
-    // 是否执行成功
+    /**
+     * 是否执行成功
+     */
     private boolean success;
 
-    public IPCResponse(String result, String message, boolean success) {
+    public IPCResponse(String result, boolean success) {
         this.result = result;
-        this.message = message;
         this.success = success;
     }
 
     protected IPCResponse(Parcel in) {
         result = in.readString();
-        message = in.readString();
         success = in.readByte() != 0;
     }
 
@@ -44,14 +44,6 @@ public class IPCResponse implements Parcelable {
         this.result = result;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public boolean isSuccess() {
         return success;
     }
@@ -68,7 +60,6 @@ public class IPCResponse implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(result);
-        dest.writeString(message);
         dest.writeByte((byte) (success ? 1 : 0));
     }
 
@@ -76,7 +67,6 @@ public class IPCResponse implements Parcelable {
     public String toString() {
         return "IPCResponse{" +
                 "result='" + result + '\'' +
-                ", message='" + message + '\'' +
                 ", success=" + success +
                 '}';
     }

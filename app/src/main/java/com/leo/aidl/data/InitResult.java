@@ -1,7 +1,6 @@
 package com.leo.aidl.data;
 
-import android.util.Log;
-
+import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.provider.IBindSuccessListener;
 
 public class InitResult implements IBindSuccessListener {
@@ -25,7 +24,7 @@ public class InitResult implements IBindSuccessListener {
 
     @Override
     public void onInitSuccess() {
-        Log.i(TAG, "onInitSuccess");
+        XLog.i(TAG, "onInitSuccess");
         isInit = true;
     }
 

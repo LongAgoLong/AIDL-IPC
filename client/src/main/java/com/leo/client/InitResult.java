@@ -1,7 +1,6 @@
 package com.leo.client;
 
-import android.util.Log;
-
+import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.client.IAttachSuccessListener;
 
 public class InitResult implements IAttachSuccessListener {
@@ -25,7 +24,7 @@ public class InitResult implements IAttachSuccessListener {
 
     @Override
     public void onInitSuccess() {
-        Log.i(TAG, "onInitSuccess");
+        XLog.i(TAG, "onInitSuccess");
         isInit = true;
     }
 

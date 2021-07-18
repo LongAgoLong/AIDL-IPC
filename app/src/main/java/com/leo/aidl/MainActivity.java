@@ -1,7 +1,6 @@
 package com.leo.aidl;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.leo.aidl.data.DataManager;
 import com.leo.aidl.data.InitResult;
 import com.leo.aidl.service.ServiceCenter;
+import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.bean.PoiBean;
 import com.leo.lib_interface.client.IPoiListener;
 
@@ -29,12 +29,12 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.pushBtn);
         button.setOnClickListener(v -> {
             if (!InitResult.getInstance().isInit()) {
-                Log.e("LEO-TEST", "Not Init.");
+                XLog.e("LEO-TEST", "Not Init.");
                 return;
             }
             IPoiListener iPoiListener = ServiceCenter.getInstance().get(IPoiListener.class);
             if (null == iPoiListener) {
-                Log.e("LEO-TEST", "IPoiListener is NULL");
+                XLog.e("LEO-TEST", "IPoiListener is NULL");
                 return;
             }
             ArrayList<PoiBean> poiBeans = new ArrayList<>();

@@ -19,3 +19,5 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.leo.aidl.**{*;}
+-keep class com.leo.lib_interface.**{*;}
