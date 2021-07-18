@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mResultTv.setText(null);
                 break;
             case R.id.sendRequestBtn:
-                if (!InitResult.getInstance().isInit()) {
+                if (!IpcLinkStatus.getInstance().isInit()) {
                     XLog.e("LEO-TEST", "Not Init.");
                     return;
                 }

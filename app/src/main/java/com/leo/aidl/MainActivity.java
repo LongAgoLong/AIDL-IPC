@@ -5,7 +5,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.leo.aidl.data.InitResult;
+import com.leo.aidl.data.IpcLinkStatus;
 import com.leo.aidl.service.ServiceCenter;
 import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.bean.PoiBean;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         Button button = findViewById(R.id.pushBtn);
         button.setOnClickListener(v -> {
-            if (!InitResult.getInstance().isInit()) {
+            if (!IpcLinkStatus.getInstance().isInit()) {
                 XLog.e("LEO-TEST", "Not Init.");
                 return;
             }

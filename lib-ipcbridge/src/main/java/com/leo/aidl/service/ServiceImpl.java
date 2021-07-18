@@ -6,11 +6,12 @@ import com.leo.aidl.IClientBridge;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
+import com.leo.aidl.util.DeathRecipientImpl;
 import com.leo.aidl.util.GsonHelper;
 import com.leo.aidl.util.ParamsConvert;
 import com.leo.aidl.util.XLog;
-import com.leo.lib_interface.client.IAttachSuccessListener;
-import com.leo.lib_interface.provider.IBindSuccessListener;
+import com.leo.lib_interface.client.IAttachStatusListener;
+import com.leo.lib_interface.provider.IBindStatusListener;
 
 import java.lang.reflect.Method;
 
@@ -41,19 +42,31 @@ public class ServiceImpl extends IService.Stub {
 
     @Override
     public void attach(IClientBridge iClientBridge) throws RemoteException {
-        iClientBridge.asBinder().linkToDeath(() -> {
-            // 客户端挂了
-            XLog.e(TAG, "client died.");
-        }, 0);
+        DeathRecipientImpl deathRecipient = new DeathRecipientImpl(iClientBridge.asBinder()) {
+            @Override
+            public void binderDied() {
+                this.unbind();
+                // 客户端挂了
+                XLog.e(TAG, "client died.");
+                // 通知服务端连接断开
+                Class<?> aClass = ServiceCenter.getInstance().getClass(IBindStatusListener.class.getName());
+                if (null != aClass) {
+                    IBindStatusListener initListener = (IBindStatusListener) ServiceCenter.getInstance()
+                            .getObject(aClass.getName());
+                    initListener.onBindStatus(false);
+                }
+            }
+        };
+        deathRecipient.bind();
         ServiceCenter.getInstance().setClientBridge(iClientBridge);
         // 通知客户端连接成功
-        ServiceCenter.getInstance().get(IAttachSuccessListener.class).onInitSuccess();
+        ServiceCenter.getInstance().get(IAttachStatusListener.class).onInitStatus(true);
         // 通知服务端连接成功
-        Class<?> aClass = ServiceCenter.getInstance().getClass(IBindSuccessListener.class.getName());
+        Class<?> aClass = ServiceCenter.getInstance().getClass(IBindStatusListener.class.getName());
         if (null != aClass) {
-            IBindSuccessListener initListener = (IBindSuccessListener) ServiceCenter.getInstance()
+            IBindStatusListener initListener = (IBindStatusListener) ServiceCenter.getInstance()
                     .getObject(aClass.getName());
-            initListener.onInitSuccess();
+            initListener.onBindStatus(true);
         }
     }
 }

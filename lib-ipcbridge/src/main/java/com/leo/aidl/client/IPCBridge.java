@@ -13,14 +13,16 @@ import com.leo.aidl.IPCCache;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
+import com.leo.aidl.util.DeathRecipientImpl;
 import com.leo.aidl.util.XLog;
+import com.leo.lib_interface.client.IAttachStatusListener;
 
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
 public class IPCBridge {
     private static final String TAG = "IPCBridge";
-    private static IPCBridge IPCBridge;
+    private static volatile IPCBridge IPCBridge;
 
     private IService mIpcService;
     private final IPCCache mIpcCache;
@@ -51,12 +53,23 @@ public class IPCBridge {
             XLog.i(TAG, "绑定成功");
             mUIHandler.removeCallbacksAndMessages(null);
             IService iService = IService.Stub.asInterface(service);
-            try {
-                iService.asBinder().linkToDeath(() -> {
-                    // 重新绑定操作
+            DeathRecipientImpl deathRecipient = new DeathRecipientImpl(iService.asBinder()) {
+                @Override
+                public void binderDied() {
+                    this.unbind();
                     XLog.e(TAG, "service died.");
+                    Class<?> aClass = getInstance().getClass(IAttachStatusListener.class.getName());
+                    if (null != aClass) {
+                        IAttachStatusListener initListener = (IAttachStatusListener) getInstance()
+                                .getObject(aClass.getName());
+                        initListener.onInitStatus(false);
+                    }
+                    // 重新绑定操作
                     rebind();
-                }, 0);
+                }
+            };
+            deathRecipient.bind();
+            try {
                 iService.attach(clientImpl);
             } catch (RemoteException e) {
                 e.printStackTrace();
