@@ -6,6 +6,7 @@ import com.leo.aidl.IClientBridge;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
+import com.leo.aidl.util.GsonHelper;
 import com.leo.aidl.util.ParamsConvert;
 import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.client.IAttachSuccessListener;
@@ -30,7 +31,7 @@ public class ServiceImpl extends IService.Stub {
 
             Object[] params = ParamsConvert.unSerializationParams(request.getParameters());
             Object result = me.invoke(object, params);
-            String r = ParamsConvert.mGson.toJson(result);
+            String r = GsonHelper.toJson(result);
             return new IPCResponse(r, true);
         } catch (Exception e) {
             e.printStackTrace();

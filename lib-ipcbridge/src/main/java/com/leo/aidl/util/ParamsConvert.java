@@ -1,11 +1,8 @@
 package com.leo.aidl.util;
 
-import com.google.gson.Gson;
 import com.leo.aidl.IPCParameter;
 
 public class ParamsConvert {
-
-    public static Gson mGson = new Gson();
 
     public static Class<?>[] getParameterTypes(IPCParameter[] parameters) {
         Class<?>[] parameterTypes;
@@ -29,7 +26,7 @@ public class ParamsConvert {
             objects = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
                 IPCParameter pa = parameters[i];
-                objects[i] = mGson.fromJson(pa.getValue(), pa.getType());
+                objects[i] = GsonHelper.fromJson(pa.getValue(), pa.getType());
             }
         }
         return objects;
@@ -43,7 +40,7 @@ public class ParamsConvert {
             p = new IPCParameter[params.length];
             for (int i = 0; i < params.length; i++) {
                 Object o = params[i];
-                p[i] = new IPCParameter(o.getClass(), mGson.toJson(o), parameterTypes[i]);
+                p[i] = new IPCParameter(o.getClass(), GsonHelper.toJson(o), parameterTypes[i]);
             }
         }
         return p;
