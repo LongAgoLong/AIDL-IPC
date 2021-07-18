@@ -1,4 +1,4 @@
-package com.leo.client;
+package com.leo.client.data;
 
 import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.client.IAttachStatusListener;
