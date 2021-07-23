@@ -28,10 +28,52 @@ android {
 }
 
 dependencies {
-
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation 'com.google.code.gson:gson:2.6.1'
-    api project(path: ':lib-interface')
+    implementation('com.google.code.gson:gson:2.6.1')
+    implementation project(path: ':lib-interface')
 }
+
+task jarDeleteOld(type: Delete, dependsOn: build) {
+    println("=============== Delete old ./output ===============")
+    delete 'build/output'
+}
+
+task jarCopyClassesInterface(type: Copy, dependsOn: ['compileReleaseJavaWithJavac', 'jarDeleteOld']) {
+    println("=============== copyClasses lib-interface ===============")
+    from('../lib-interface/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/com/leo/lib_interface')
+    into('build/outputs/classes/release/com/leo/lib_interface')
+    exclude('**/R.class')
+    exclude('**/BuildConfig.class')
+}
+
+task jarCopyClassesBridge(type: Copy, dependsOn: ['compileReleaseJavaWithJavac', 'jarCopyClassesInterface']) {
+    println("=============== copyClasses lib-interface ===============")
+    from('build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/com/leo/aidl')
+    into('build/outputs/classes/release/com/leo/aidl')
+    exclude('**/R.class')
+    exclude('**/BuildConfig.class')
+}
+
+task jarCoDriverSDK(type: Jar, dependsOn: ['compileReleaseJavaWithJavac', 'jarCopyClassesBridge']) {
+    println("=============== jarCoDriverSDK ===============")
+    archiveName = "ipcbridge-sdk-debug.jar"
+    from('build/outputs/classes/release/')
+    destinationDir = file('build/outputs/jar')
+    exclude('**/R.class')
+    exclude('**/R\$*.class')
+    exclude('**/BuildConfig.class')
+}
+
+//def androidSDKDir = plugins.getPlugin('com.android.library').sdkHandler.getSdkFolder()
+//def androidSDKDir = project.android.sdkDirectory
+//def androidJarDir = androidSDKDir.toString() + '/platforms/' + "${android.compileSdkVersion}" + '/android.jar'
+//
+//task jarProguardCoDriverSDK(type: proguard.gradle.ProGuardTask, dependsOn: ['jarCoDriverSDK']) {
+//    println("=============== jarProguardCoDriverSDK ===============")
+//    injars("build/outputs/jar/ipcbridge-sdk-debug.jar")
+//    outjars("build/outputs/jar/ipcbridge-sdk-release.jar")
+//    libraryjars(androidJarDir)
+//    configuration 'proguard-rules.pro'
+//}
