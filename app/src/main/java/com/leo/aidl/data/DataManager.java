@@ -8,6 +8,14 @@ public class DataManager implements IData {
     private DataManager() {
     }
 
+    @Override
+    public DataBean getData(int i) {
+        DataBean dataBean = new DataBean();
+        dataBean.setName(getRandomName(i));
+        dataBean.setTime(System.currentTimeMillis());
+        return dataBean;
+    }
+
     private static class SingleHold {
         public static final DataManager INSTANCE = new DataManager();
     }
@@ -16,16 +24,12 @@ public class DataManager implements IData {
         return SingleHold.INSTANCE;
     }
 
-    @Override
-    public DataBean getData() {
-        DataBean dataBean = new DataBean();
-        dataBean.setName(getRandomName());
-        dataBean.setTime(System.currentTimeMillis());
-        return dataBean;
-    }
-
-    private String getRandomName() {
-        return getRandomChar() + String.valueOf(getRandomChar());
+    private String getRandomName(int length) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            builder.append(getRandomChar());
+        }
+        return builder.toString();
     }
 
     private char getRandomChar() {

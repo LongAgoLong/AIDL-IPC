@@ -20,9 +20,10 @@ import com.leo.lib_interface.client.IAttachStatusListener;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
-public class IPCBridge {
+public class IpcClient {
     private static final String TAG = "IPCBridge";
-    private static volatile IPCBridge IPCBridge;
+    private static volatile IpcClient mIpcClient;
+    private static final Object LOCK = new Object();
 
     private IService mIpcService;
     private final IPCCache mIpcCache;
@@ -32,19 +33,19 @@ public class IPCBridge {
 
     private Context mContext;
 
-    private IPCBridge() {
+    private IpcClient() {
         mIpcCache = new IPCCache();
     }
 
-    public static IPCBridge getInstance() {
-        if (null == IPCBridge) {
-            synchronized (IPCBridge.class) {
-                if (null == IPCBridge) {
-                    IPCBridge = new IPCBridge();
+    public static IpcClient getInstance() {
+        if (null == mIpcClient) {
+            synchronized (IpcClient.class) {
+                if (null == mIpcClient) {
+                    mIpcClient = new IpcClient();
                 }
             }
         }
-        return IPCBridge;
+        return mIpcClient;
     }
 
     private final ServiceConnection connection = new ServiceConnection() {
@@ -65,6 +66,7 @@ public class IPCBridge {
                         initListener.onInitStatus(false);
                     }
                     // 重新绑定操作
+                    mIpcService = null;
                     rebind();
                 }
             };
@@ -117,11 +119,11 @@ public class IPCBridge {
         mIpcCache.unRegister(object);
     }
 
-    public Class<?> getClass(String interfacesName) {
+    Class<?> getClass(String interfacesName) {
         return mIpcCache.getClass(interfacesName);
     }
 
-    public Object getObject(String className) {
+    Object getObject(String className) {
         return mIpcCache.getObject(className);
     }
 
@@ -136,23 +138,25 @@ public class IPCBridge {
         return null;
     }
 
-    public <T> T get(Class<T> inter) {
+    public <T> T getService(Class<T> inter) {
+        if (inter == null) {
+            throw new RuntimeException("inter is null.");
+        }
         if (!inter.isInterface()) {
             throw new RuntimeException("inter must be interface.");
         }
         String name = inter.getName();
-        if (null == mIpcService) {
-            return null;
-        }
         // 获取处理客户端请求的对象的Key，以此在服务端找出对应的处理者
-        if (mInvocationMap.containsKey(name)) {
-            return (T) mInvocationMap.get(name);
-        } else {
-            T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class[]{inter},
-                    new ClientInvocationHandler(name));
-            mInvocationMap.put(name, t);
-            return t;
+        synchronized (LOCK) {
+            if (mInvocationMap.containsKey(name)) {
+                return (T) mInvocationMap.get(name);
+            } else {
+                T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
+                        new Class[]{inter},
+                        new ClientInvocationHandler(name));
+                mInvocationMap.put(name, t);
+                return t;
+            }
         }
     }
 }

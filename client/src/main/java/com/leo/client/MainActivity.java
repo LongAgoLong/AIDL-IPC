@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.leo.aidl.client.IPCBridge;
+import com.leo.aidl.client.IpcClient;
 import com.leo.aidl.util.XLog;
 import com.leo.client.data.IpcLinkStatus;
 import com.leo.lib_interface.bean.DataBean;
@@ -18,6 +18,7 @@ import com.leo.lib_interface.provider.IData;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, IPoiListener {
+    private static final String TAG = "client-MainActivity";
     private TextView mResultTv;
 
     @Override
@@ -26,14 +27,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
 
-        IPCBridge.getInstance().register(this);
+        IpcClient.getInstance().register(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        IPCBridge.getInstance().unbindService(this);
-        IPCBridge.getInstance().unRegister(this);
+        IpcClient.getInstance().unbindService(this);
+        IpcClient.getInstance().unRegister(this);
     }
 
     private void initView() {
@@ -51,17 +52,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.sendRequestBtn:
                 if (!IpcLinkStatus.getInstance().isInit()) {
-                    XLog.e("LEO-TEST", "Not Init.");
+                    XLog.e(TAG, "Not Init.");
                     return;
                 }
-                IData iData = IPCBridge.getInstance().get(IData.class);
+                IData iData = IpcClient.getInstance().getService(IData.class);
                 if (null == iData) {
-                    XLog.e("LEO-TEST", "iData is NULL");
+                    XLog.e(TAG, "iData is NULL");
                     return;
                 }
-                DataBean data = iData.getData();
+                DataBean data = iData.getData(3);
                 if (data == null) {
-                    XLog.e("LEO-TEST", "data is null.");
+                    XLog.e(TAG, "data is null.");
                     return;
                 }
                 mResultTv.append(data.toString() + "\n");

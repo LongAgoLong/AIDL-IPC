@@ -8,7 +8,7 @@ import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
 import com.leo.aidl.util.DeathRecipientImpl;
 import com.leo.aidl.util.GsonHelper;
-import com.leo.aidl.util.ParamsConvert;
+import com.leo.aidl.util.IpcConvert;
 import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.client.IAttachStatusListener;
 import com.leo.lib_interface.provider.IBindStatusListener;
@@ -21,16 +21,19 @@ public class ServiceImpl extends IService.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = ServiceCenter.getInstance().getClass(request.getInterfacesName());
+            Class<?> aClass = IpcService.getInstance().getClass(request.getInterfacesName());
             if (aClass == null) {
                 XLog.e(TAG, "The implementation class was not found.[" + request.getInterfacesName() + "]");
                 return new IPCResponse("", false);
             }
-            Object object = ServiceCenter.getInstance().getObject(aClass.getName());
+            Object object = IpcService.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
-                    ParamsConvert.getParameterTypes(request.getParameters()));
-
-            Object[] params = ParamsConvert.unSerializationParams(request.getParameters());
+                    IpcConvert.getParameterTypes(request.getParameters()));
+            if (me == null) {
+                XLog.e(TAG, "The method was not found.[" + request.getMethodName() + "]");
+                return new IPCResponse("", false);
+            }
+            Object[] params = IpcConvert.unSerializationParams(request.getParameters());
             Object result = me.invoke(object, params);
             String r = GsonHelper.toJson(result);
             return new IPCResponse(r, true);
@@ -48,23 +51,24 @@ public class ServiceImpl extends IService.Stub {
                 this.unbind();
                 // 客户端挂了
                 XLog.e(TAG, "client died.");
+                IpcService.getInstance().setClientBridge(null);
                 // 通知服务端连接断开
-                Class<?> aClass = ServiceCenter.getInstance().getClass(IBindStatusListener.class.getName());
+                Class<?> aClass = IpcService.getInstance().getClass(IBindStatusListener.class.getName());
                 if (null != aClass) {
-                    IBindStatusListener initListener = (IBindStatusListener) ServiceCenter.getInstance()
+                    IBindStatusListener initListener = (IBindStatusListener) IpcService.getInstance()
                             .getObject(aClass.getName());
                     initListener.onBindStatus(false);
                 }
             }
         };
         deathRecipient.bind();
-        ServiceCenter.getInstance().setClientBridge(iClientBridge);
+        IpcService.getInstance().setClientBridge(iClientBridge);
         // 通知客户端连接成功
-        ServiceCenter.getInstance().get(IAttachStatusListener.class).onInitStatus(true);
+        IpcService.getInstance().getClient(IAttachStatusListener.class).onInitStatus(true);
         // 通知服务端连接成功
-        Class<?> aClass = ServiceCenter.getInstance().getClass(IBindStatusListener.class.getName());
+        Class<?> aClass = IpcService.getInstance().getClass(IBindStatusListener.class.getName());
         if (null != aClass) {
-            IBindStatusListener initListener = (IBindStatusListener) ServiceCenter.getInstance()
+            IBindStatusListener initListener = (IBindStatusListener) IpcService.getInstance()
                     .getObject(aClass.getName());
             initListener.onBindStatus(true);
         }

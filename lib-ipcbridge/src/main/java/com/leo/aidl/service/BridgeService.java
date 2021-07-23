@@ -8,6 +8,7 @@ public class BridgeService extends Service {
     private final ServiceImpl serviceImpl = new ServiceImpl();
 
     public BridgeService() {
+        // 如若需要，可设置成前台服务
     }
 
     @Override

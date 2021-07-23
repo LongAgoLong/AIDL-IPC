@@ -17,25 +17,26 @@ import java.util.HashMap;
  * in Baidu Company
  * 提供给service使用的帮助类
  */
-public class ServiceCenter {
+public class IpcService {
+    private static final Object LOCK = new Object();
     private IClientBridge mIClientBridge;
     private final IPCCache mIpcCache;
     private final HashMap<String, Object> mInvocationMap = new HashMap<>();
-    private static volatile ServiceCenter mServiceCenter;
+    private static volatile IpcService mIpcService;
 
-    private ServiceCenter() {
+    private IpcService() {
         mIpcCache = new IPCCache();
     }
 
-    public static ServiceCenter getInstance() {
-        if (null == mServiceCenter) {
-            synchronized (ServiceCenter.class) {
-                if (null == mServiceCenter) {
-                    mServiceCenter = new ServiceCenter();
+    public static IpcService getInstance() {
+        if (null == mIpcService) {
+            synchronized (IpcService.class) {
+                if (null == mIpcService) {
+                    mIpcService = new IpcService();
                 }
             }
         }
-        return mServiceCenter;
+        return mIpcService;
     }
 
     public void register(Object object) {
@@ -46,11 +47,11 @@ public class ServiceCenter {
         mIpcCache.unRegister(object);
     }
 
-    public Class<?> getClass(String interfacesName) {
+    Class<?> getClass(String interfacesName) {
         return mIpcCache.getClass(interfacesName);
     }
 
-    public Object getObject(String className) {
+    Object getObject(String className) {
         return mIpcCache.getObject(className);
     }
 
@@ -69,21 +70,25 @@ public class ServiceCenter {
         return null;
     }
 
-    public <T> T get(Class<T> inter) {
+    public <T> T getClient(Class<T> inter) {
+        if (inter == null) {
+            throw new RuntimeException("inter is null.");
+        }
+        if (!inter.isInterface()) {
+            throw new RuntimeException("inter must be interface.");
+        }
         String name = inter.getName();
-        if (null == mIClientBridge) {
-            return null;
-        }
         // 获取处理客户端请求的对象的Key，以此在服务端找出对应的处理者
-        if (mInvocationMap.containsKey(name)) {
-            return (T) mInvocationMap.get(name);
-        } else {
-            T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class[]{inter},
-                    new ServiceInvocationHandler(name));
-            mInvocationMap.put(name, t);
-            return t;
+        synchronized (LOCK) {
+            if (mInvocationMap.containsKey(name)) {
+                return (T) mInvocationMap.get(name);
+            } else {
+                T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
+                        new Class[]{inter},
+                        new ServiceInvocationHandler(name));
+                mInvocationMap.put(name, t);
+                return t;
+            }
         }
-
     }
 }

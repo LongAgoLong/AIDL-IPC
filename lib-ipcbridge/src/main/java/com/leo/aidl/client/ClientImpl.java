@@ -6,7 +6,7 @@ import com.leo.aidl.IClientBridge;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.util.GsonHelper;
-import com.leo.aidl.util.ParamsConvert;
+import com.leo.aidl.util.IpcConvert;
 import com.leo.aidl.util.XLog;
 
 import java.lang.reflect.Method;
@@ -17,16 +17,19 @@ public class ClientImpl extends IClientBridge.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = IPCBridge.getInstance().getClass(request.getInterfacesName());
+            Class<?> aClass = IpcClient.getInstance().getClass(request.getInterfacesName());
             if (aClass == null) {
                 XLog.e(TAG, "The implementation class was not found.[" + request.getInterfacesName() + "]");
                 return new IPCResponse("", false);
             }
-            Object object = IPCBridge.getInstance().getObject(aClass.getName());
+            Object object = IpcClient.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
-                    ParamsConvert.getParameterTypes(request.getParameters()));
-
-            Object[] params = ParamsConvert.unSerializationParams(request.getParameters());
+                    IpcConvert.getParameterTypes(request.getParameters()));
+            if (me == null) {
+                XLog.e(TAG, "The method was not found.[" + request.getMethodName() + "]");
+                return new IPCResponse("", false);
+            }
+            Object[] params = IpcConvert.unSerializationParams(request.getParameters());
             Object result = me.invoke(object, params);
             String r = GsonHelper.toJson(result);
             return new IPCResponse(r, true);

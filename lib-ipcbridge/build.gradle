@@ -56,9 +56,9 @@ task jarCopyClassesBridge(type: Copy, dependsOn: ['compileReleaseJavaWithJavac',
     exclude('**/BuildConfig.class')
 }
 
-task jarCoDriverSDK(type: Jar, dependsOn: ['compileReleaseJavaWithJavac', 'jarCopyClassesBridge']) {
-    println("=============== jarCoDriverSDK ===============")
-    archiveName = "ipcbridge-sdk-debug.jar"
+task jarPackSDK(type: Jar, dependsOn: ['compileReleaseJavaWithJavac', 'jarCopyClassesBridge']) {
+    println("=============== jarPackSDK ===============")
+    archiveName = "ipcbridge-sdk.jar"
     from('build/outputs/classes/release/')
     destinationDir = file('build/outputs/jar')
     exclude('**/R.class')

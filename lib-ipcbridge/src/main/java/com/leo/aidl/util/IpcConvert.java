@@ -1,8 +1,20 @@
 package com.leo.aidl.util;
 
 import com.leo.aidl.IPCParameter;
+import com.leo.aidl.IPCRequest;
 
-public class ParamsConvert {
+import java.lang.reflect.Method;
+
+public class IpcConvert {
+
+    public static IPCRequest build(String interfacesName, Method method, Object[] args) {
+        IPCRequest ipcRequest = new IPCRequest();
+        ipcRequest.setInterfacesName(interfacesName);
+        ipcRequest.setMethodName(method.getName());
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        ipcRequest.setParameters(IpcConvert.serializationParams(args, parameterTypes));
+        return ipcRequest;
+    }
 
     public static Class<?>[] getParameterTypes(IPCParameter[] parameters) {
         Class<?>[] parameterTypes;
@@ -26,21 +38,20 @@ public class ParamsConvert {
             objects = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
                 IPCParameter pa = parameters[i];
-                objects[i] = GsonHelper.fromJson(pa.getValue(), pa.getType());
+                objects[i] = GsonHelper.fromJson(pa.getValue(), pa.getParameterType());
             }
         }
         return objects;
     }
 
-    public static IPCParameter[] serializationParams(Object[] params, Class<?>[] parameterTypes) {
+    private static IPCParameter[] serializationParams(Object[] params, Class<?>[] parameterTypes) {
         IPCParameter[] p;
         if (params == null) {
             p = new IPCParameter[0];
         } else {
             p = new IPCParameter[params.length];
             for (int i = 0; i < params.length; i++) {
-                Object o = params[i];
-                p[i] = new IPCParameter(o.getClass(), GsonHelper.toJson(o), parameterTypes[i]);
+                p[i] = new IPCParameter(GsonHelper.toJson(params[i]), parameterTypes[i]);
             }
         }
         return p;
