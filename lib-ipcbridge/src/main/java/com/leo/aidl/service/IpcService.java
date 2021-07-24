@@ -55,11 +55,11 @@ public class IpcService {
         return mIpcCache.getObject(className);
     }
 
-    public void setClientBridge(IClientBridge iClientBridge) {
+    void setClientBridge(IClientBridge iClientBridge) {
         this.mIClientBridge = iClientBridge;
     }
 
-    public IPCResponse sendRequest(IPCRequest ipcRequest) {
+    IPCResponse sendRequest(IPCRequest ipcRequest) {
         if (null != mIClientBridge) {
             try {
                 return mIClientBridge.sendRequest(ipcRequest);

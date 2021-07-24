@@ -9,7 +9,7 @@ import com.leo.aidl.data.IpcLinkStatus;
 import com.leo.aidl.service.IpcService;
 import com.leo.aidl.util.XLog;
 import com.leo.lib_interface.bean.PoiBean;
-import com.leo.lib_interface.client.IPoiListener;
+import com.leo.lib_interface.client.IDemoPoiListener;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 XLog.e(TAG, "Not Init.");
                 return;
             }
-            IPoiListener iPoiListener = IpcService.getInstance().getClient(IPoiListener.class);
+            IDemoPoiListener iPoiListener = IpcService.getInstance().getClient(IDemoPoiListener.class);
             if (null == iPoiListener) {
                 XLog.e(TAG, "IPoiListener is NULL");
                 return;

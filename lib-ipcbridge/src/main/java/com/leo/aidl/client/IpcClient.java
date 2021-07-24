@@ -51,7 +51,7 @@ public class IpcClient {
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            XLog.i(TAG, "绑定成功");
+            XLog.i(TAG, "bind service success");
             mUIHandler.removeCallbacksAndMessages(null);
             IService iService = IService.Stub.asInterface(service);
             DeathRecipientImpl deathRecipient = new DeathRecipientImpl(iService.asBinder()) {
@@ -107,7 +107,7 @@ public class IpcClient {
         if (null == mIpcService) {
             return;
         }
-        XLog.i(TAG, "取消绑定");
+        XLog.i(TAG, "unbind");
         context.unbindService(connection);
     }
 
@@ -127,7 +127,7 @@ public class IpcClient {
         return mIpcCache.getObject(className);
     }
 
-    public IPCResponse sendRequest(IPCRequest ipcRequest) {
+    IPCResponse sendRequest(IPCRequest ipcRequest) {
         if (null != mIpcService) {
             try {
                 return mIpcService.sendRequest(ipcRequest);

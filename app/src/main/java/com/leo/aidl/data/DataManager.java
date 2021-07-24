@@ -1,9 +1,9 @@
 package com.leo.aidl.data;
 
 import com.leo.lib_interface.bean.DataBean;
-import com.leo.lib_interface.provider.IData;
+import com.leo.lib_interface.provider.IDemoData;
 
-public class DataManager implements IData {
+public class DataManager implements IDemoData {
 
     private DataManager() {
     }

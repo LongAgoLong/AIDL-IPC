@@ -37,6 +37,7 @@ dependencies {
 
 task jarDeleteOld(type: Delete, dependsOn: build) {
     println("=============== Delete old ./output ===============")
+    delete '../lib-interface/build/output'
     delete 'build/output'
 }
 

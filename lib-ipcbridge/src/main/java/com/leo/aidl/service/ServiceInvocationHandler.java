@@ -27,12 +27,12 @@ public class ServiceInvocationHandler extends BaseInvocationHandler {
         IPCResponse ipcResponse = IpcService.getInstance().sendRequest(ipcRequest);
         Class<?> returnType = method.getReturnType();
         if (ipcResponse != null && ipcResponse.isSuccess()) {
-            if (returnType != void.class && returnType != Void.class) {
-                return mGson.fromJson(ipcResponse.getResult(), returnType);
+            if (returnType == void.class || returnType == Void.class) {
+                return null;
             }
-        } else if (returnType != void.class && returnType != Void.class) {
+            return mGson.fromJson(ipcResponse.getResult(), returnType);
+        } else {
             return createDefaultResult(returnType);
         }
-        return null;
     }
 }

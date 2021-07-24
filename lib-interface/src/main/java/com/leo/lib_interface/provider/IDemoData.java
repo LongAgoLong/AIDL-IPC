@@ -2,6 +2,9 @@ package com.leo.lib_interface.provider;
 
 import com.leo.lib_interface.bean.DataBean;
 
-public interface IData {
+/**
+ * demo
+ */
+public interface IDemoData {
     DataBean getData(int length);
 }

@@ -12,12 +12,12 @@ import com.leo.aidl.util.XLog;
 import com.leo.client.data.IpcLinkStatus;
 import com.leo.lib_interface.bean.DataBean;
 import com.leo.lib_interface.bean.PoiBean;
-import com.leo.lib_interface.client.IPoiListener;
-import com.leo.lib_interface.provider.IData;
+import com.leo.lib_interface.client.IDemoPoiListener;
+import com.leo.lib_interface.provider.IDemoData;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, IPoiListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, IDemoPoiListener {
     private static final String TAG = "client-MainActivity";
     private TextView mResultTv;
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     XLog.e(TAG, "Not Init.");
                     return;
                 }
-                IData iData = IpcClient.getInstance().getService(IData.class);
+                IDemoData iData = IpcClient.getInstance().getService(IDemoData.class);
                 if (null == iData) {
                     XLog.e(TAG, "iData is NULL");
                     return;
