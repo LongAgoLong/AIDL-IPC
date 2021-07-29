@@ -14,7 +14,7 @@ import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
 import com.leo.aidl.IService;
 import com.leo.aidl.util.DeathRecipientImpl;
-import com.leo.aidl.util.XLog;
+import com.leo.aidl.util.IpcLog;
 import com.leo.lib_interface.client.IAttachStatusListener;
 
 import java.lang.reflect.Proxy;
@@ -51,14 +51,14 @@ public class IpcClient {
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            XLog.i(TAG, "bind service success");
+            IpcLog.i(TAG, "bind service success");
             mUIHandler.removeCallbacksAndMessages(null);
             IService iService = IService.Stub.asInterface(service);
             DeathRecipientImpl deathRecipient = new DeathRecipientImpl(iService.asBinder()) {
                 @Override
                 public void binderDied() {
                     this.unbind();
-                    XLog.e(TAG, "service died.");
+                    IpcLog.e(TAG, "service died.");
                     Class<?> aClass = getInstance().getClass(IAttachStatusListener.class.getName());
                     if (null != aClass) {
                         IAttachStatusListener initListener = (IAttachStatusListener) getInstance()
@@ -92,7 +92,7 @@ public class IpcClient {
     }
 
     private void bind() {
-        XLog.i(TAG, "bind.");
+        IpcLog.i(TAG, "bind.");
         Intent intent = new Intent("com.leo.aidl");
         intent.setPackage("com.leo.aidl");
         mContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -107,7 +107,7 @@ public class IpcClient {
         if (null == mIpcService) {
             return;
         }
-        XLog.i(TAG, "unbind");
+        IpcLog.i(TAG, "unbind");
         context.unbindService(connection);
     }
 

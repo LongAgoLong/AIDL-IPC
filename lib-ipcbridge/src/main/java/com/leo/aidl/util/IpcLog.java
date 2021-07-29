@@ -2,7 +2,7 @@ package com.leo.aidl.util;
 
 import android.util.Log;
 
-public class XLog {
+public class IpcLog {
     private static final String TAG = "ipc_bridge_";
     private static int mLevel;
 

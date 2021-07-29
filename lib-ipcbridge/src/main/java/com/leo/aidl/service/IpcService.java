@@ -70,6 +70,22 @@ public class IpcService {
         return null;
     }
 
+    /**
+     * 是否与客户端建立通信
+     *
+     * @return
+     */
+    public boolean isClientAttach() {
+        return mIClientBridge != null;
+    }
+
+    /**
+     * 获取客户端的代理
+     *
+     * @param inter
+     * @param <T>
+     * @return
+     */
     public <T> T getClient(Class<T> inter) {
         if (inter == null) {
             throw new RuntimeException("inter is null.");

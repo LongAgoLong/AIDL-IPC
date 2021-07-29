@@ -9,7 +9,7 @@ import com.leo.aidl.IService;
 import com.leo.aidl.util.DeathRecipientImpl;
 import com.leo.aidl.util.GsonHelper;
 import com.leo.aidl.util.IpcConvert;
-import com.leo.aidl.util.XLog;
+import com.leo.aidl.util.IpcLog;
 import com.leo.lib_interface.client.IAttachStatusListener;
 import com.leo.lib_interface.provider.IBindStatusListener;
 
@@ -23,14 +23,14 @@ public class ServiceImpl extends IService.Stub {
         try {
             Class<?> aClass = IpcService.getInstance().getClass(request.getInterfacesName());
             if (aClass == null) {
-                XLog.e(TAG, "The implementation class was not found.[" + request.getInterfacesName() + "]");
+                IpcLog.e(TAG, "The implementation class was not found.[" + request.getInterfacesName() + "]");
                 return new IPCResponse("", false);
             }
             Object object = IpcService.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
                     IpcConvert.getParameterTypes(request.getParameters()));
             if (me == null) {
-                XLog.e(TAG, "The method was not found.[" + request.getMethodName() + "]");
+                IpcLog.e(TAG, "The method was not found.[" + request.getMethodName() + "]");
                 return new IPCResponse("", false);
             }
             Object[] params = IpcConvert.unSerializationParams(request.getParameters());
@@ -50,15 +50,10 @@ public class ServiceImpl extends IService.Stub {
             public void binderDied() {
                 this.unbind();
                 // 客户端挂了
-                XLog.e(TAG, "client died.");
+                IpcLog.e(TAG, "client died.");
                 IpcService.getInstance().setClientBridge(null);
                 // 通知服务端连接断开
-                Class<?> aClass = IpcService.getInstance().getClass(IBindStatusListener.class.getName());
-                if (null != aClass) {
-                    IBindStatusListener initListener = (IBindStatusListener) IpcService.getInstance()
-                            .getObject(aClass.getName());
-                    initListener.onBindStatus(false);
-                }
+                notifyBindStatus(false);
             }
         };
         deathRecipient.bind();
@@ -66,11 +61,20 @@ public class ServiceImpl extends IService.Stub {
         // 通知客户端连接成功
         IpcService.getInstance().getClient(IAttachStatusListener.class).onInitStatus(true);
         // 通知服务端连接成功
+        notifyBindStatus(true);
+    }
+
+    /**
+     * 通知服务端连接状态
+     *
+     * @param isSuccess
+     */
+    private void notifyBindStatus(boolean isSuccess) {
         Class<?> aClass = IpcService.getInstance().getClass(IBindStatusListener.class.getName());
         if (null != aClass) {
             IBindStatusListener initListener = (IBindStatusListener) IpcService.getInstance()
                     .getObject(aClass.getName());
-            initListener.onBindStatus(true);
+            initListener.onBindStatus(isSuccess);
         }
     }
 }
