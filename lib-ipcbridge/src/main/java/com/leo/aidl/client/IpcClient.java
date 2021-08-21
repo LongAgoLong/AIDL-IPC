@@ -99,6 +99,9 @@ public class IpcClient {
     private void bind() {
         IpcLog.i(TAG, "bind.");
         Intent intent = new Intent("com.leo.aidl");
+        ComponentName componentName = new ComponentName(mTargetPkgName,
+                "com.leo.aidl.service.BridgeService");
+        intent.setComponent(componentName);
         intent.setPackage(mTargetPkgName);
         Context context = mContextRef.get();
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
