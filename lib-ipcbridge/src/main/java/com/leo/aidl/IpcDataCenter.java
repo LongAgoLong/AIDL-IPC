@@ -5,8 +5,9 @@ import android.text.TextUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IPCCache {
-
+public class IpcDataCenter {
+    private static final String SERVER_PATH_PREFIX = "com.leo.protocol.provider";
+    private static final String CLIENT_PATH_PREFIX = "com.leo.protocol.client";
     /**
      * 保存服务端处理客户端请求的interfaces对应Class映射和内部的方法
      */
@@ -15,6 +16,22 @@ public class IPCCache {
      * 保存服务端处理客户端请求的实例
      */
     private final Map<String, Object> mInstance = new HashMap<>();
+
+    private volatile static IpcDataCenter INSTANCE;
+
+    public static IpcDataCenter getInstance() {
+        if (INSTANCE == null) {
+            synchronized (IpcDataCenter.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new IpcDataCenter();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private IpcDataCenter() {
+    }
 
     /**
      * 缓存对象及其方法
@@ -49,8 +66,8 @@ public class IPCCache {
             if (interfaces.length != 0) {
                 for (Class<?> inter : interfaces) {
                     // 加上接口名的path限制
-                    if (inter.getName().startsWith("com.leo.lib_interface.client")
-                            || inter.getName().startsWith("com.leo.lib_interface.provider")) {
+                    if (inter.getName().startsWith(CLIENT_PATH_PREFIX)
+                            || inter.getName().startsWith(SERVER_PATH_PREFIX)) {
                         isCache = true;
                         mClazzs.put(inter.getName(), clazz);
                     }

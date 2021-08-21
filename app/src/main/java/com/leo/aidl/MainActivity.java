@@ -7,9 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.leo.aidl.data.IpcLinkStatus;
 import com.leo.aidl.service.IpcService;
-import com.leo.aidl.util.XLog;
-import com.leo.lib_interface.bean.PoiBean;
-import com.leo.lib_interface.client.IDemoPoiListener;
+import com.leo.aidl.util.IpcLog;
+import com.leo.protocol.bean.PoiBean;
+import com.leo.protocol.client.IDemoPoiListener;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -28,12 +28,12 @@ public class MainActivity extends AppCompatActivity {
         Button button = findViewById(R.id.pushBtn);
         button.setOnClickListener(v -> {
             if (!IpcLinkStatus.getInstance().isInit()) {
-                XLog.e(TAG, "Not Init.");
+                IpcLog.e(TAG, "Not Init.");
                 return;
             }
             IDemoPoiListener iPoiListener = IpcService.getInstance().getClient(IDemoPoiListener.class);
             if (null == iPoiListener) {
-                XLog.e(TAG, "IPoiListener is NULL");
+                IpcLog.e(TAG, "IPoiListener is NULL");
                 return;
             }
             ArrayList<PoiBean> poiBeans = new ArrayList<>();

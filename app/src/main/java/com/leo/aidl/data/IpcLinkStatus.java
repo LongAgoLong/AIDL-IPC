@@ -1,7 +1,7 @@
 package com.leo.aidl.data;
 
-import com.leo.aidl.util.XLog;
-import com.leo.lib_interface.provider.IBindStatusListener;
+import com.leo.aidl.util.IpcLog;
+import com.leo.protocol.callback.IBindStatusListener;
 
 public class IpcLinkStatus implements IBindStatusListener {
     private static final String TAG = "IBindStatusListener";
@@ -24,7 +24,7 @@ public class IpcLinkStatus implements IBindStatusListener {
 
     @Override
     public void onBindStatus(boolean isSuccess) {
-        XLog.i(TAG, "onBindStatus:" + isSuccess);
+        IpcLog.i(TAG, "onBindStatus:" + isSuccess);
         isInit = isSuccess;
     }
 

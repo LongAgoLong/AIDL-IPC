@@ -7,13 +7,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.leo.aidl.IpcDataCenter;
 import com.leo.aidl.client.IpcClient;
-import com.leo.aidl.util.XLog;
+import com.leo.aidl.util.IpcLog;
 import com.leo.client.data.IpcLinkStatus;
-import com.leo.lib_interface.bean.DataBean;
-import com.leo.lib_interface.bean.PoiBean;
-import com.leo.lib_interface.client.IDemoPoiListener;
-import com.leo.lib_interface.provider.IDemoData;
+import com.leo.protocol.bean.DataBean;
+import com.leo.protocol.bean.PoiBean;
+import com.leo.protocol.client.IDemoPoiListener;
+import com.leo.protocol.provider.IDemoData;
 
 import java.util.List;
 
@@ -27,14 +28,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
 
-        IpcClient.getInstance().register(this);
+        IpcDataCenter.getInstance().register(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         IpcClient.getInstance().unbindService(this);
-        IpcClient.getInstance().unRegister(this);
+        IpcDataCenter.getInstance().unRegister(this);
     }
 
     private void initView() {
@@ -52,17 +53,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.sendRequestBtn:
                 if (!IpcLinkStatus.getInstance().isInit()) {
-                    XLog.e(TAG, "Not Init.");
+                    IpcLog.e(TAG, "Not Init.");
                     return;
                 }
                 IDemoData iData = IpcClient.getInstance().getService(IDemoData.class);
                 if (null == iData) {
-                    XLog.e(TAG, "iData is NULL");
+                    IpcLog.e(TAG, "iData is NULL");
                     return;
                 }
                 DataBean data = iData.getData(3);
                 if (data == null) {
-                    XLog.e(TAG, "data is null.");
+                    IpcLog.e(TAG, "data is null.");
                     return;
                 }
                 mResultTv.append(data.toString() + "\n");

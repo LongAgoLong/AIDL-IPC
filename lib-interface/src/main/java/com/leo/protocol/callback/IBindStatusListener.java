@@ -1,7 +1,7 @@
-package com.leo.lib_interface.provider;
+package com.leo.protocol.callback;
 
 /**
- * 连接状态回调给Service
+ * 连接状态回调
  */
 public interface IBindStatusListener {
 

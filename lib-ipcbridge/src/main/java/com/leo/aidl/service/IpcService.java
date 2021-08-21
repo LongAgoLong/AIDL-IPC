@@ -1,11 +1,17 @@
 package com.leo.aidl.service;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.leo.aidl.IClientBridge;
-import com.leo.aidl.IPCCache;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
+import com.leo.aidl.util.IpcLog;
+import com.leo.ipcbridge.BuildConfig;
+import com.leo.protocol.BaseListener;
+import com.leo.protocol.callback.IBindStatusListener;
 
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -20,12 +26,15 @@ import java.util.HashMap;
 public class IpcService {
     private static final Object LOCK = new Object();
     private IClientBridge mIClientBridge;
-    private final IPCCache mIpcCache;
     private final HashMap<String, Object> mInvocationMap = new HashMap<>();
     private static volatile IpcService mIpcService;
+    /**
+     * 连接状态监听
+     */
+    private IBindStatusListener mIBindStatusListener;
+    private boolean mIsIpc;
 
     private IpcService() {
-        mIpcCache = new IPCCache();
     }
 
     public static IpcService getInstance() {
@@ -39,24 +48,39 @@ public class IpcService {
         return mIpcService;
     }
 
-    public void register(Object object) {
-        mIpcCache.register(object);
+    public void init(Context context, boolean isIpc) {
+        this.mIsIpc = isIpc;
+        IpcLog.setLevel(BuildConfig.DEBUG ? Log.VERBOSE : Log.INFO);
+        if (isIpc) {
+            context.startService(new Intent(context, BridgeService.class));
+        } else {
+            notifyBindStatus(true);
+        }
     }
 
-    public void unRegister(Object object) {
-        mIpcCache.unRegister(object);
+    /**
+     * 设置连接状态监听
+     *
+     * @param mIBindStatusListener
+     */
+    public void setIBindStatusListener(IBindStatusListener mIBindStatusListener) {
+        this.mIBindStatusListener = mIBindStatusListener;
     }
 
-    Class<?> getClass(String interfacesName) {
-        return mIpcCache.getClass(interfacesName);
-    }
-
-    Object getObject(String className) {
-        return mIpcCache.getObject(className);
+    /**
+     * 通知服务端连接状态
+     *
+     * @param isSuccess
+     */
+    private void notifyBindStatus(boolean isSuccess) {
+        if (mIBindStatusListener != null) {
+            mIBindStatusListener.onBindStatus(isSuccess);
+        }
     }
 
     void setClientBridge(IClientBridge iClientBridge) {
         this.mIClientBridge = iClientBridge;
+        notifyBindStatus(iClientBridge != null);
     }
 
     IPCResponse sendRequest(IPCRequest ipcRequest) {
@@ -76,7 +100,10 @@ public class IpcService {
      * @return
      */
     public boolean isClientAttach() {
-        return mIClientBridge != null;
+        if (mIsIpc) {
+            return mIClientBridge != null;
+        }
+        return true;
     }
 
     /**
@@ -86,7 +113,7 @@ public class IpcService {
      * @param <T>
      * @return
      */
-    public <T> T getClient(Class<T> inter) {
+    public <T extends BaseListener> T getClient(Class<T> inter) {
         if (inter == null) {
             throw new RuntimeException("inter is null.");
         }
@@ -101,7 +128,7 @@ public class IpcService {
             } else {
                 T t = (T) Proxy.newProxyInstance(getClass().getClassLoader(),
                         new Class[]{inter},
-                        new ServiceInvocationHandler(name));
+                        new ServiceInvocationHandler(name, mIsIpc));
                 mInvocationMap.put(name, t);
                 return t;
             }

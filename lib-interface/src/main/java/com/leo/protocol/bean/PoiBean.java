@@ -1,4 +1,4 @@
-package com.leo.lib_interface.bean;
+package com.leo.protocol.bean;
 
 import java.io.Serializable;
 

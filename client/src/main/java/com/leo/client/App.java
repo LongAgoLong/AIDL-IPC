@@ -9,7 +9,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        IpcClient.getInstance().register(IpcLinkStatus.getInstance());
-        IpcClient.getInstance().init(this);
+        IpcClient.getInstance().setIBindStatusListener(IpcLinkStatus.getInstance());
+        IpcClient.getInstance().init(this, "com.leo.aidl", true);
     }
 }

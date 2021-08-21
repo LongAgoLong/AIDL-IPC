@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep class com.leo.aidl.**{*;}
--keep class com.leo.lib_interface.**{*;}
+-keep class com.leo.protocol.**{*;}

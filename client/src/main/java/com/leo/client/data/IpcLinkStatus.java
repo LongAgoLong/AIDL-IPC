@@ -1,9 +1,9 @@
 package com.leo.client.data;
 
-import com.leo.aidl.util.XLog;
-import com.leo.lib_interface.client.IAttachStatusListener;
+import com.leo.aidl.util.IpcLog;
+import com.leo.protocol.callback.IBindStatusListener;
 
-public class IpcLinkStatus implements IAttachStatusListener {
+public class IpcLinkStatus implements IBindStatusListener {
     private static final String TAG = "IAttachStatusListener";
     private static volatile IpcLinkStatus mInstance;
     private boolean isInit;
@@ -22,13 +22,13 @@ public class IpcLinkStatus implements IAttachStatusListener {
         return mInstance;
     }
 
-    @Override
-    public void onInitStatus(boolean isSuccess) {
-        XLog.i(TAG, "onInitStatus:" + isSuccess);
-        isInit = isSuccess;
-    }
-
     public boolean isInit() {
         return isInit;
+    }
+
+    @Override
+    public void onBindStatus(boolean isSuccess) {
+        IpcLog.i(TAG, "onInitStatus:" + isSuccess);
+        isInit = isSuccess;
     }
 }

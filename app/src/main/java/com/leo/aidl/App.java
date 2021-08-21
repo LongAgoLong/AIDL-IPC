@@ -1,19 +1,17 @@
 package com.leo.aidl;
 
 import android.app.Application;
-import android.content.Intent;
 
 import com.leo.aidl.data.DataManager;
 import com.leo.aidl.data.IpcLinkStatus;
-import com.leo.aidl.service.BridgeService;
 import com.leo.aidl.service.IpcService;
 
 public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        IpcService.getInstance().register(IpcLinkStatus.getInstance());
-        IpcService.getInstance().register(DataManager.getInstance());
-        startService(new Intent(this, BridgeService.class));
+        IpcDataCenter.getInstance().register(DataManager.getInstance());
+        IpcService.getInstance().setIBindStatusListener(IpcLinkStatus.getInstance());
+        IpcService.getInstance().init(this, true);
     }
 }

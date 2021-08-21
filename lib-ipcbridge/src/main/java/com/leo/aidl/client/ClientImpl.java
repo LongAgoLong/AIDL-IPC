@@ -5,6 +5,7 @@ import android.os.RemoteException;
 import com.leo.aidl.IClientBridge;
 import com.leo.aidl.IPCRequest;
 import com.leo.aidl.IPCResponse;
+import com.leo.aidl.IpcDataCenter;
 import com.leo.aidl.util.GsonHelper;
 import com.leo.aidl.util.IpcConvert;
 import com.leo.aidl.util.IpcLog;
@@ -17,12 +18,12 @@ public class ClientImpl extends IClientBridge.Stub {
     @Override
     public IPCResponse sendRequest(IPCRequest request) throws RemoteException {
         try {
-            Class<?> aClass = IpcClient.getInstance().getClass(request.getInterfacesName());
+            Class<?> aClass = IpcDataCenter.getInstance().getClass(request.getInterfacesName());
             if (aClass == null) {
                 IpcLog.e(TAG, "The implementation class was not found.[" + request.getInterfacesName() + "]");
                 return new IPCResponse("", false);
             }
-            Object object = IpcClient.getInstance().getObject(aClass.getName());
+            Object object = IpcDataCenter.getInstance().getObject(aClass.getName());
             Method me = aClass.getMethod(request.getMethodName(),
                     IpcConvert.getParameterTypes(request.getParameters()));
             if (me == null) {
